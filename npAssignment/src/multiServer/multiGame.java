@@ -6,14 +6,18 @@ import java.util.List;
 public class multiGame {
 	private boolean correct;
 	private int numberOfPlayer;
-	private int goal;
+	static  int goal;
 	//one game has multi-players
-	private ArrayList userList;
+	private ArrayList<user> userList = new ArrayList<>(6);
 	
 	
 	public multiGame() 
 	{
 		
+	}
+	public List<user> getUserList()
+	{
+		return userList;
 	}
 	public void startGame() 
 	{
@@ -21,11 +25,6 @@ public class multiGame {
 		correct =false;
 	}
 	
-	public void creatLobby() 
-	{
-		userList = new ArrayList<user>(6);
-	}
-
 	//add user
 	public boolean add(user u) 
 	{
@@ -36,47 +35,89 @@ public class multiGame {
 		}
 		else 
 		{
-			System.out.println("user lobbyFul");
+			System.out.println("user lobby already full");
 			return false;
 		}
 			
 	}
 	
+	public void printUserList() 
+	{
+		for(int i=0;i<userList.size();i++) 
+		{
+			System.out.println(userList.get(i).getUsername()+" "+userList.get(i).getPort());
+		}
+	}
+	
 	//if user play again
-	public synchronized void adjustOrder(user u) 
+	public  void adjustOrder(user u) 
 	{   
 		//every time server takes first three users in lobby
-		for(int i=0; i<3;i++) 
+		for(int i=0; i<userList.size();i++) 
 		{
 			user userTemp =(user)userList.get(i);
 			if(userTemp.equals(u)) 
 			{   //remove the user & add it at back
-				userList.remove(i);
-				userList.add(u);
-			}
-			
+				userList.remove(i);			
+			}	
 		}
+		userList.add(u);
 	}
 	
-	public boolean searchUser(String username)
+	public void removeUser(user u) 
 	{
-		for(int i =0; i<6;i++) 
+		for(int i=0; i<userList.size();i++) 
 		{
-			user u = (user)userList.get(i);
-			if(u.getUsername() ==username) 
-			{
-				return true;
-			}
+			user userTemp =(user)userList.get(i);
+			if(userTemp.equals(u)) 
+			{   //remove the user & add it at back
+				userList.remove(i);			
+			}	
 		}
-		return false;
 	}
 	
 
 	
-	public List getUserList() 
+	public boolean searchUser(int port)
 	{
-		return userList;
+		if(userList.size()!=0) 
+		{
+			for(int i =0; i<userList.size();i++) 
+			{
+				if(!(userList.get(i)== null)) 
+				{
+					user u = (user)userList.get(i);
+					if(u.getPort()==port) 
+					{
+						return true;
+					}
+				}		
+			}
+		}
+		
+		return false;
 	}
+	
+	public user identfyUser(int port)
+	{
+		if(userList.size()!=0) 
+		{
+			for(int i =0; i<userList.size();i++) 
+			{
+				if(!(userList.get(i)== null)) 
+				{
+					user u = (user)userList.get(i);
+					if(u.getPort()==port) 
+					{
+						return u;
+					}
+				}		
+			}
+		}
+		
+		return null;
+	}
+	
 	
 	public int getGoal() 
 	{

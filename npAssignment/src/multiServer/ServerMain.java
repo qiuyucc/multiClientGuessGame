@@ -9,21 +9,13 @@ import java.util.Date;
 public class ServerMain {
 	public static void main(String [] args) 
 	{
-		int port =8818;
-		try {
-			ServerSocket serverSocket = new ServerSocket(port);
-			while(true) 
-			{		//create connection between server and client
-				System.out.println("About to accept client connection ....");
-				Socket clientSocket = serverSocket.accept();
-				System.out.println("Accepted connection from: " +clientSocket.getPort());
-				ServerWorker worker = new ServerWorker(clientSocket);
-				worker.start();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		multiGame game =new multiGame();
+		//game.creatLobby();
+		//System.out.println(game.getUserList().size());
+		
+		int port =8833;
+		Server server  = new Server(port);
+		server.start();
 		
 	}
 	

@@ -6,6 +6,7 @@ public class user {
 	private int count;
 	private boolean registered =false;
 	private int port;
+	private String ipAddress;
 	
 	public user(String username, int port) 
 	{
@@ -13,6 +14,7 @@ public class user {
 		this.port = port;
 		//this.attempt = -1;
 		this.count = 0;
+		//this.ipAddress = ipAddress;
 		this.registered =true;
 	}
 	
