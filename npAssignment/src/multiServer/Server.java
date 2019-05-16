@@ -10,6 +10,8 @@ public class Server extends Thread{
 
 	private final int serverPort;
 	private ArrayList<ServerWorker> workerList = new ArrayList<>(6);
+	private ArrayList<multiGame> gameList = new ArrayList<>(1);
+	private ArrayList<ServerWorker> playerList = new ArrayList<>(3);
 	
 	public Server(int serverPort) 
 	{
@@ -21,6 +23,15 @@ public class Server extends Thread{
 		return workerList;
 	}
 	
+	public List<ServerWorker> getPlayerList()
+	{
+		return playerList;
+	}
+	
+	public List<multiGame> getGameList()
+	{
+		return gameList;
+	}
 	public void run(){
 		try {
 			ServerSocket serverSocket = new ServerSocket(serverPort);
@@ -43,6 +54,28 @@ public class Server extends Thread{
 	{
 		workerList.remove(serverWorker);
 	}
+	public void removePlayer(ServerWorker serverWorker) 
+	{
+		playerList.remove(serverWorker);
+	}
+	public void addPlayer(ServerWorker serverWorker) 
+	{
+		playerList.add(serverWorker);
+	}
+	
+	public void addGame(multiGame g) 
+	{
+		gameList.add(g);
+	}
+	
+	public void newGame() 
+	{
+		multiGame g = gameList.get(0);
+		gameList.remove(g);
+		multiGame newGame = new multiGame();
+		gameList.add(newGame);
+	};
+	
 	public void rearrangeWorker(ServerWorker serverWorker) 
 	{
 		workerList.remove(serverWorker);

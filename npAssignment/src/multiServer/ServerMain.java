@@ -9,12 +9,14 @@ import java.util.Date;
 public class ServerMain {
 	public static void main(String [] args) 
 	{
-		multiGame game =new multiGame();
+		//multiGame game =new multiGame();
 		//game.creatLobby();
 		//System.out.println(game.getUserList().size());
 		
-		int port =8833;
+		int port =61918;
 		Server server  = new Server(port);
+		multiGame game = new multiGame();
+		server.addGame(game);
 		server.start();
 		
 	}

@@ -38,10 +38,11 @@ public class gameClient {
 
 	public static void main(String[] args) throws IOException {
 
-		gameClient client = new gameClient("10.132.101.103", 8833);
-		//gameClient client = new gameClient("192.168.1.137", 8833);
+		//gameClient client = new gameClient("10.132.101.103", 8833);
+		gameClient client = new gameClient("192.168.1.137", 61918);
 		Scanner kb = new Scanner(System.in);
 		String line, input;
+		boolean correct = false;
 		if (!client.connect()) {
 			System.out.println("Connect failed.");
 		} else {
@@ -49,76 +50,81 @@ public class gameClient {
 			System.out.println("Enter username:");
 			String username = kb.nextLine();
 			client.login(username);
-
-			while (true) {
-		
-				while ((line = client.getBufferedIn().readLine()) != null) {
-					String[] tokens = StringUtils.split(line);
+			while(true) 
+			{
+				while((line = client.getBufferedIn().readLine()) != null) {
+					String[] tokens = line.split(" ");
 					//String response = client.getBufferedIn().readLine();
 					System.out.println("Server Response:"+line);
 					if (tokens != null && tokens.length > 0) {
 						String cmd = tokens[0];
-						if ("start".equals(cmd)) {
-							while (client.guessNumber() == false) {
+						if ("start".equalsIgnoreCase(cmd)) {	
+							System.out.println("Guess the number:");
+							String num = kb.nextLine();
+							client.guessNumber(num);
+						}else if("result".equalsIgnoreCase(cmd)) 
+						{   
+							System.out.println("Guess the number:");
+							String num = kb.nextLine();
+							client.guessNumber(num);
+						}else if("Congratulation!".equals(cmd)||"fail".equalsIgnoreCase(cmd)) 
+						{
+							System.out.println("wating for result....");
+						}else if("announcement".equalsIgnoreCase(cmd)) 
+						{
+							System.out.println("User command:");
+							input = kb.nextLine();
+							if (input.equalsIgnoreCase("q")) {
+								client.logoff();
+								break;
 							}
-							break;
+							else if (input.equalsIgnoreCase("p")) {
+								client.playAgain();
+								break;
 						}
-					
+						}
 					}
 				}
-				System.out.println("User Command:");
-				if ((input = kb.nextLine()).equalsIgnoreCase("q")) {
-					client.logoff();
-					break;
-				}
-				if ((input = kb.nextLine()).equalsIgnoreCase("p")) {
-					client.playAgain();
-					break;
-				}
+				
 			}
+			}
+				
 
 		}
-	}
+	
 
 	private void login(String username) throws IOException {
 		String cmd = "login " + username + "\n";
 		serverOut.write(cmd.getBytes());
-		String response = bufferedIn.readLine();
-		System.out.println("Server Response: " + response);
-		/*
-		 * if ("wait in lobby....".equalsIgnoreCase(response)) { return true; } else {
-		 * return false; }
-		 */
+
 	}
 
 	private void logoff() throws IOException {
 		String cmd = "q\n";
 		serverOut.write(cmd.getBytes());
-		String response = bufferedIn.readLine();
-		System.out.println("Server Response: " + response);
-
 	}
 
-	private boolean guessNumber() throws IOException {
-		System.out.println("Guess the number:");
-		Scanner kb = new Scanner(System.in);
-		int number = kb.nextInt();
-		String cmd = "guess " + number + "\n";
-		serverOut.write(cmd.getBytes());
-		String response = bufferedIn.readLine();
-		System.out.println("Server Response: " + response);
-		if ("Congratulation!".equalsIgnoreCase(response)
-				|| "You have reached maximum guess of 4".equalsIgnoreCase(response)) {
-			return true;
+	private void guessNumber(String input) throws IOException {
+		if(input.equalsIgnoreCase("e")) 
+		{
+			String cmd ="e\n";
+			serverOut.write(cmd.getBytes());
+		}else 
+		{
+			String cmd = "guess " + input + "\n";
+			serverOut.write(cmd.getBytes());
+		
+			
 		}
-		return false;
+		//String response = bufferedIn.readLine();
+		//System.out.println("Server Response: " + response);
 	}
 
 	private void playAgain() throws IOException {
-		String cmd = "p\n";
+		String cmd = "p"+"\n";
 		serverOut.write(cmd.getBytes());
-		String response = bufferedIn.readLine();
-		System.out.println("Server Response: " + response);
+		//String response = bufferedIn.readLine();
+		//System.out.println("Server Response: " + response);
 	}
 
 	private boolean connect() {
