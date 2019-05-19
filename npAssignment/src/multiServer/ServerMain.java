@@ -9,10 +9,7 @@ import java.util.Date;
 public class ServerMain {
 	public static void main(String [] args) 
 	{
-		//multiGame game =new multiGame();
-		//game.creatLobby();
-		//System.out.println(game.getUserList().size());
-		
+		//run the concurrent server
 		int port =61918;
 		Server server  = new Server(port);
 		multiGame game = new multiGame();

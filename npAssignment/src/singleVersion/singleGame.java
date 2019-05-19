@@ -25,7 +25,7 @@ public class singleGame {
 	{
 		return correct;
 	}
-	
+	//validate number in server
 	public String validate(int guess) 
 	{
 		String msg = null;

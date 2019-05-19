@@ -18,7 +18,7 @@ public class gameClient {
 	private OutputStream serverOut;
 	private InputStream serverIn;
 	private BufferedReader bufferedIn;
-
+	
 	public gameClient(String serverName, int serverPort) {
 		this.serverName = serverName;
 		this.serverPort = serverPort;
@@ -38,8 +38,8 @@ public class gameClient {
 
 	public static void main(String[] args) throws IOException {
 
-		//gameClient client = new gameClient("10.132.101.103", 8833);
-		gameClient client = new gameClient("192.168.1.137", 61918);
+		
+		gameClient client = new gameClient("nprgprdap01.int.its.rmit.edu.au", 61918);
 		Scanner kb = new Scanner(System.in);
 		String line, input;
 		boolean correct = false;
@@ -48,16 +48,19 @@ public class gameClient {
 		} else {
 			System.out.println("Connect successful");
 			System.out.println("Enter username:");
+			//user login section before enter into for loop
 			String username = kb.nextLine();
 			client.login(username);
 			while(true) 
 			{
+				//read the input from server, and call the function based on command
 				while((line = client.getBufferedIn().readLine()) != null) {
 					String[] tokens = line.split(" ");
 					//String response = client.getBufferedIn().readLine();
 					System.out.println("Server Response:"+line);
 					if (tokens != null && tokens.length > 0) {
 						String cmd = tokens[0];
+						//if server send start game, client can guess the number
 						if ("start".equalsIgnoreCase(cmd)) {	
 							System.out.println("Guess the number:");
 							String num = kb.nextLine();
@@ -92,18 +95,18 @@ public class gameClient {
 
 		}
 	
-
+	// send the login info to server by user input
 	private void login(String username) throws IOException {
 		String cmd = "login " + username + "\n";
 		serverOut.write(cmd.getBytes());
 
 	}
-
+	//send the logoff request to server
 	private void logoff() throws IOException {
 		String cmd = "q\n";
 		serverOut.write(cmd.getBytes());
 	}
-
+	// user guess the number
 	private void guessNumber(String input) throws IOException {
 		if(input.equalsIgnoreCase("e")) 
 		{
@@ -119,14 +122,12 @@ public class gameClient {
 		//String response = bufferedIn.readLine();
 		//System.out.println("Server Response: " + response);
 	}
-
+	//user want to play again
 	private void playAgain() throws IOException {
 		String cmd = "p"+"\n";
 		serverOut.write(cmd.getBytes());
-		//String response = bufferedIn.readLine();
-		//System.out.println("Server Response: " + response);
 	}
-
+	//set up connection
 	private boolean connect() {
 		try {
 			Socket socket = new Socket(serverName, serverPort);

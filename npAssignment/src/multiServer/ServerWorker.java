@@ -32,7 +32,6 @@ public class ServerWorker extends Thread {
 
 	public void run() {
 		try {
-			System.out.println(server.getGameList().get(0).getGoal());
 			handleClientSocket();
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -50,13 +49,14 @@ public class ServerWorker extends Thread {
 		line = reader.readLine();
 		String[] tokens = line.split(" ");
 		String cmd = tokens[0];
-
+		//login in section
 		if ("login".equalsIgnoreCase(cmd)) {
 			this.play = handleLogin(tokens);
 		}
 		while (play) {
-
+			//while clients login, it will wait other users to login and start the game
 			this.sleep(20000);
+			//server send msg to the first three players in the list
 			sendMessage();
 			while ((line = reader.readLine()) != null) {
 				String[] token = line.split(" ");
@@ -71,7 +71,6 @@ public class ServerWorker extends Thread {
 						playAgain();
 						break;
 					} else if ("e".equalsIgnoreCase(cmd)) {
-						// System.out.println("here");
 						exitRound();
 					} else {
 						String msg = "unknown command " + cmd + "\n";
@@ -84,7 +83,7 @@ public class ServerWorker extends Thread {
 		clientSocket.close();
 
 	}
-
+	//function for validate number based on clients' input
 	private void validate(String[] tokens) throws IOException {
 		List<multiGame> goalList = server.getGameList();
 		// List<ServerWorker> playerList = server.getPlayerList();
@@ -95,9 +94,11 @@ public class ServerWorker extends Thread {
 			System.out.println("user" + clientSocket.getPort() + " guess:" + number + " current attempt:" + this.count);
 			if (this.count <= 4) {
 				if (num == goalList.get(0).getGoal()) {
+					//if correct guess, the result will be sent to clients 
 					String msg = "Congratulation!" + "\n";
 					server.removePlayer(this);
 					os.write(msg.getBytes());
+					//while no user in the playerList, the server announce the results to all users and starts another round
 					if (server.getPlayerList().isEmpty()) {
 						announceResult();
 						server.newGame();
@@ -112,6 +113,7 @@ public class ServerWorker extends Thread {
 				}
 
 			} else if (this.count == 5) {
+				//if user reached maximum guess of 4, which means fail in this round
 				String msg = "fail " + "You have reached maximum guess of 4!" + "\n";
 				this.count = 4;
 				server.removePlayer(this);
@@ -125,12 +127,13 @@ public class ServerWorker extends Thread {
 			}
 		}
 	}
-
+	//announce the result to everyone who connected to server
 	private void announceResult() throws IOException {
 		List<ServerWorker> workerList = server.getWorkerList();
 		if (workerList.size() >= 3) {
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < 3; i++) {
+				//append the username with how many guesses he made
 				sb.append((i + 1) + "." + workerList.get(i).getUsername() + " " + workerList.get(i).getCount()
 						+ "times. ");
 			}
@@ -152,13 +155,13 @@ public class ServerWorker extends Thread {
 		}
 
 	}
-
+	//send the command to start game
 	private void startGame() throws IOException {
 
 		String cmd = "start " + "game" + "\n";
 		os.write(cmd.getBytes());
 	}
-
+	//send the message to announce the player name at the begining of each round
 	private void sendMessage() throws IOException, InterruptedException {
 		List<ServerWorker> workerList = server.getWorkerList();
 		boolean found = false;
@@ -178,6 +181,7 @@ public class ServerWorker extends Thread {
 				this.startGame();
 				server.addPlayer(this);
 			} else {
+				//send message to player who had no chance to play in this round
 				String msg2 = "Wait for the next round...\n";
 				this.send(msg2);
 			}
@@ -203,7 +207,7 @@ public class ServerWorker extends Thread {
 			}
 		}
 	}
-
+	//send msg functino
 	private void send(String msg) throws IOException {
 		if (username != null) {
 			os.write(msg.getBytes());
@@ -218,7 +222,7 @@ public class ServerWorker extends Thread {
 	public int getCount() {
 		return count;
 	}
-
+	//function for server to handleLogin
 	private boolean handleLogin(String[] tokens) throws IOException {
 		List<ServerWorker> workerList = server.getWorkerList();
 
@@ -231,6 +235,7 @@ public class ServerWorker extends Thread {
 				System.out.println("user" + clientSocket.getPort() + " add into lobby!");
 				return true;
 			}
+			//if any users want to access the server while lobby is full
 			String msg = "lobby already full!";
 			os.write(msg.getBytes());
 			return false;
@@ -238,7 +243,7 @@ public class ServerWorker extends Thread {
 		return false;
 
 	}
-
+	//function to handle logoff
 	private void handleLogoff() throws IOException {
 		play = false;
 		this.count = 0;
@@ -250,16 +255,17 @@ public class ServerWorker extends Thread {
 		clientSocket.close();
 
 	}
-
+	//function to handle play again
 	private void playAgain() throws IOException {
 		this.count = 0;
 		String msg = "wait in lobby....\n";
 		System.out.println("user" + clientSocket.getPort() + " wants play again!" + "");
 		os.write(msg.getBytes());
+		//if user wants to play again, re-positioning in list, attach at the end of list.
 		server.rearrangeWorker(this);
 
 	}
-
+	//user exit current round and waiting for result
 	private void exitRound() throws IOException {
 		this.count = 4;
 		System.out.println("user" + clientSocket.getPort() + " exit the round");

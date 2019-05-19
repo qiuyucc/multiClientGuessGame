@@ -7,7 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server extends Thread{
-
+	
+	/*
+	 * workerList: store the current client server
+	 * gameList: store the random number used for each round
+	 * playerList: store the users currently playing in the round
+	 * */
 	private final int serverPort;
 	private ArrayList<ServerWorker> workerList = new ArrayList<>(6);
 	private ArrayList<multiGame> gameList = new ArrayList<>(1);
@@ -41,6 +46,7 @@ public class Server extends Thread{
 				Socket clientSocket = serverSocket.accept();
 				System.out.println("Accepted connection from: " +clientSocket.getPort());
 				ServerWorker worker = new ServerWorker(this,clientSocket);
+				//for each client, will be store into list
 				workerList.add(worker);
 				worker.start();
 			}
